@@ -5,17 +5,14 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-)
 
-func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"status":"OK"}`))
-}
+	"github.com/tamaco489/supabase_sample/api/shop/intrnal/handler"
+)
 
 func main() {
 	ctx := context.Background()
 
-	http.HandleFunc("/api/healthcheck", healthCheckHandler)
+	http.HandleFunc("/api/healthcheck", handler.HealthCheckHandler)
 
 	slog.InfoContext(ctx, "Server starting on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
