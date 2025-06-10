@@ -38,3 +38,11 @@ down:
 
 logs:
 	docker compose logs -f shop-api
+
+
+# =================================================================
+# api request
+# =================================================================
+.PHONY: healthcheck
+healthcheck:
+	curl -sX GET http://localhost:8080/api/healthcheck | jq .
