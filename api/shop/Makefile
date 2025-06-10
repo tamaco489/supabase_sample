@@ -50,6 +50,6 @@ healthcheck:
 		-H 'accept: application/json' | jq .
 
 get-me:
-	curl -sX 'GET' \
+	curl -i -X 'GET' \
 		'http://localhost:8080/shop/v1/users/me' \
-		-H 'accept: application/json' | jq .
+		-H 'accept: application/json'
