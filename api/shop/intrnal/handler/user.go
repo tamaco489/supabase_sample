@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -24,34 +25,30 @@ func GetMe(w http.ResponseWriter, r *http.Request) {
 
 	db := repository.GetPool()
 
-	// NOTE: 本来はJWT等から取得するべき
+	// NOTE: Should be obtained from JWT etc.
 	uid := "0cefb56b-55c7-41ba-97c7-c30ee4918dc2"
 
-	rows, err := db.Query(r.Context(), "SELECT * FROM users WHERE id = $1", uid)
-	if err != nil {
-		slog.ErrorContext(r.Context(), "failed to query users", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	defer rows.Close()
-
-	user := User{}
-	for rows.Next() {
-		if err := rows.Scan(
-			&user.ID,
-			&user.UserName,
-			&user.Email,
-			&user.Role,
-			&user.Status,
-			&user.LastLoginAt,
-			&user.CreatedAt,
-			&user.UpdatedAt,
-		); err != nil {
-			slog.ErrorContext(r.Context(), "failed to scan user", "error", err)
-			w.WriteHeader(http.StatusInternalServerError)
+	// Get user information from the database
+	user := new(User)
+	if err := db.QueryRow(r.Context(), "SELECT id, username, email, role, status, last_login_at, created_at, updated_at FROM users WHERE id = $1", uid).Scan(
+		&user.ID,
+		&user.UserName,
+		&user.Email,
+		&user.Role,
+		&user.Status,
+		&user.LastLoginAt,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	); err != nil {
+		// If the user is not found, return a 404 error
+		if err == sql.ErrNoRows {
+			slog.ErrorContext(r.Context(), "user not found", "error", err)
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
+		slog.ErrorContext(r.Context(), "failed to query user", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
