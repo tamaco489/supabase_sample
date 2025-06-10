@@ -43,6 +43,13 @@ logs:
 # =================================================================
 # api request
 # =================================================================
-.PHONY: healthcheck
+.PHONY: healthcheck get-users-me
 healthcheck:
-	curl -sX GET http://localhost:8080/api/healthcheck | jq .
+	curl -sX 'GET' \
+		'http://localhost:8080/shop/v1/healthcheck' \
+		-H 'accept: application/json' | jq .
+
+get-me:
+	curl -sX 'GET' \
+		'http://localhost:8080/shop/v1/users/me' \
+		-H 'accept: application/json' | jq .
