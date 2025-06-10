@@ -2,7 +2,10 @@ module github.com/tamaco489/supabase_sample/api/shop
 
 go 1.24.2
 
-require github.com/jackc/pgx/v5 v5.7.5
+require (
+	github.com/jackc/pgx/v5 v5.7.5
+	github.com/joho/godotenv v1.5.1
+)
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

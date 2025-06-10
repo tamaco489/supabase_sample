@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
+	"os"
 	"sync"
 	"time"
 
@@ -27,21 +29,23 @@ type DBConfig struct {
 
 func GetDBConfig() DBConfig {
 	return DBConfig{
-		User:     "",
-		Password: "",
-		Host:     "",
-		Port:     "",
-		DBName:   "",
-		SSLMode:  "verify-full",
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSL_MODE"),
 	}
 }
 
-func getDSN(config DBConfig) string {
-	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", config.User, config.Password, config.Host, config.Port, config.DBName, config.SSLMode)
+func getDSN(cfg DBConfig) string {
+	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
 }
 
 func InitDB(ctx context.Context) {
 	once.Do(func() {
+		slog.InfoContext(ctx, "Connecting to database", "dsn", getDSN(GetDBConfig()))
+
 		cfg, err := pgxpool.ParseConfig(getDSN(GetDBConfig()))
 		if err != nil {
 			log.Fatalf("Failed to parse DB config: %v", err)

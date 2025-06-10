@@ -6,11 +6,16 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/joho/godotenv"
 	"github.com/tamaco489/supabase_sample/api/shop/intrnal/handler"
 	"github.com/tamaco489/supabase_sample/api/shop/intrnal/repository"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file: ", err)
+	}
+
 	ctx := context.Background()
 	repository.InitDB(ctx)
 
